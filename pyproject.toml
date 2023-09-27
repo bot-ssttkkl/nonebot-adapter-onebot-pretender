@@ -1,18 +1,23 @@
 [tool.poetry]
-name = "Project Name"
+name = "nonebot-adapter-onebot-pretender"
 version = "0.1.0"
 description = ""
-authors = ["Your Name <you@example.com>"]
+authors = ["ssttkkl <huang.wen.long@hotmail.com>"]
 license = "MIT"
 readme = "README.md"
-homepage = ""
-repository = ""
+homepage = "https://github.com/bot-ssttkkl/nonebot-adapter-onebot-pretender"
+repository = "https://github.com/bot-ssttkkl/nonebot-adapter-onebot-pretender"
 documentation = ""
 keywords = []
 classifiers = []
+packages = [
+  { include = "nonebot" }
+]
 
 [tool.poetry.dependencies]
 python = "^3.8"
+nonebot2 = "^2.1.0"
+nonebot-adapter-onebot = "^2.3.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.0.275"
@@ -20,6 +25,7 @@ isort = "^5.10.1"
 black = "^23.1.0"
 nonemoji = "^0.1.2"
 pre-commit = "^3.1.0"
+nonebot2 = { extras = ["fastapi", "websockets", "httpx"], version = "^2.1.0" }
 
 [tool.black]
 line-length = 88
