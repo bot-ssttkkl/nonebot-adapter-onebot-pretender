@@ -7,7 +7,7 @@ from nonebot.adapters import (Adapter as BaseAdapter, Bot as BaseBot, Event as B
 from nonebot.adapters.onebot.v11 import (Adapter as OB11Adapter, Bot as OB11Bot)
 from typing_extensions import override
 
-from ..patch_handle_event import patch_event_handler, origin_handle_event
+from ..patch_handle_event import patch_event_handle, origin_handle_event
 
 if TYPE_CHECKING:
     from .pretender import OB11Pretender
@@ -23,7 +23,7 @@ class Adapter(OB11Adapter, Generic[T_ActualAdapter, T_ActualBot], ABC):
         self.pretender = self.get_pretender_type()(self)
         self.actual_adapter = self._create_actual_adapter_with_hack(driver, **kwargs)
 
-        @patch_event_handler
+        @patch_event_handle
         async def handle_event(bot: BaseBot, event: BaseEvent) -> bool:
             if bot.self_id in self.actual_adapter.bots:
                 handled_event = await self.pretender.handle_event(bot, event)
@@ -73,4 +73,4 @@ class Adapter(OB11Adapter, Generic[T_ActualAdapter, T_ActualBot], ABC):
 
     @override
     async def _call_api(self, bot: OB11Bot, api: str, **data: Any) -> Any:
-        return self.pretender.handle_api_call(bot, api, **data)
+        return await self.pretender.handle_api_call(bot, api, **data)

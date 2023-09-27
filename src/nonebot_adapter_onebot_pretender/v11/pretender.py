@@ -1,8 +1,7 @@
-from abc import ABC, abstractmethod, ABCMeta
-from typing import TypeVar, Generic, Type, Any, Callable, TYPE_CHECKING, Dict, Optional
+from abc import abstractmethod, ABCMeta
+from typing import TypeVar, Generic, Type, Any, Callable, TYPE_CHECKING, Dict, Optional, Tuple
 
-from nonebot import logger
-from nonebot.adapters import Adapter as BaseAdapter, Bot as BaseBot, Event as BaseEvent
+from nonebot.adapters import Adapter as BaseAdapter, Bot as BaseBot, Event as BaseEvent, Message as BaseMessage
 from nonebot.adapters.onebot.v11 import Bot as OB11Bot, Event as OB11Event, ApiNotAvailable
 
 if TYPE_CHECKING:
@@ -17,10 +16,10 @@ T_EventHandler = Callable[["OB11Pretender", T_ActualBot, T_ActualEvent], OB11Eve
 
 
 class OB11PretenderMeta(ABCMeta):
-    def __new__(mcls, name, base, namespace, *args, **kwargs):
+    def __new__(mcls, name: str, base: Tuple[type, ...], namespace: dict, *args, **kwargs):
         api_call_handlers = {}
 
-        for item in namespace:
+        for item in namespace.values():
             if getattr(item, "__api_call_handler__", False):
                 api_call_handlers[item.__api_call_name__] = item
 
@@ -28,16 +27,16 @@ class OB11PretenderMeta(ABCMeta):
 
         event_handlers = {}
 
-        for item in namespace:
+        for item in namespace.values():
             if getattr(item, "__event_handler__", False):
                 event_handlers[item.__event_type__] = item
 
-        namespace["_event_handler_mapping"] = api_call_handlers
+        namespace["_event_handler_mapping"] = event_handlers
 
         return super().__new__(mcls, name, base, namespace, **kwargs)
 
 
-class OB11Pretender(Generic[T_ActualAdapter, T_ActualBot], metaclass=OB11PretenderMeta):
+class OB11Pretender(Generic[T_ActualAdapter, T_ActualBot, T_ActualEvent], metaclass=OB11PretenderMeta):
     _api_call_handler_mapping: Dict[str, T_ApiHandler]
     _event_handler_mapping: Dict[Type[BaseEvent], T_EventHandler]
 
