@@ -11,7 +11,7 @@ documentation = ""
 keywords = []
 classifiers = []
 packages = [
-  { include = "nonebot" }
+  { include = "nonebot", from = "src" }
 ]
 
 [tool.poetry.dependencies]
@@ -26,6 +26,10 @@ black = "^23.1.0"
 nonemoji = "^0.1.2"
 pre-commit = "^3.1.0"
 nonebot2 = { extras = ["fastapi", "websockets", "httpx"], version = "^2.1.0" }
+
+
+[tool.poetry.group.adapters.dependencies]
+nonebot-adapter-red = "^0.5.0"
 
 [tool.black]
 line-length = 88

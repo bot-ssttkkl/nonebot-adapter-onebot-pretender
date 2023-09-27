@@ -590,6 +590,25 @@ nonebot2 = ">=2.1.0,<3.0.0"
 typing-extensions = ">=4.0.0,<5.0.0"
 
 [[package]]
+name = "nonebot-adapter-red"
+version = "0.5.0"
+description = "Red Protocol Adapter for Nonebot2"
+category = "dev"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "nonebot_adapter_red-0.5.0-py3-none-any.whl", hash = "sha256:5da804d0d755b7b23116b80857fe30458d7d4058469b9e65952f25397e7b398a"},
+    {file = "nonebot_adapter_red-0.5.0.tar.gz", hash = "sha256:51fa65080039d6527c7f4242e7fb0fdbeef1a3a5ca35e7b4368faa73b73a004a"},
+]
+
+[package.dependencies]
+nonebot2 = ">=2.0.1"
+packaging = ">=23.1"
+
+[package.extras]
+auto-detect = ["PyYAML"]
+
+[[package]]
 name = "nonebot2"
 version = "2.1.0"
 description = "An asynchronous python bot framework."
@@ -1281,4 +1300,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "2e2a867bd10402393efa89e584bb9764b9b744c80406640def137e9c96331199"
+content-hash = "42488e7fc34b41af1417db600b506da4ff2b76063e4b6da07d96f505b95db5d4"
