@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from base64 import b64decode
 from typing import Dict, Type, Union, Optional
@@ -6,16 +7,17 @@ from nonebot.utils import logger_wrapper
 from nonebot.adapters.red import Bot as RedBot
 from nonebot.adapters.red import Message as RedMsg
 from nonebot.adapters.red import event as red_event
-from nonebot.adapters.red.api.model import ChatType
-from nonebot.adapters.onebot.v11.event import Sender
+from nonebot.adapters.onebot.v11 import ActionFailed
 from nonebot.adapters.red import Adapter as RedAdapter
 from nonebot.adapters.red import MessageSegment as RedMS
 from nonebot.adapters.onebot.v11 import Message as OB11Msg
 from nonebot.adapters.onebot.v11 import event as ob11_event
+from nonebot.adapters.onebot.v11.event import Reply, Sender
 from nonebot.adapters.onebot.v11 import MessageSegment as OB11MS
 
-from ..factory import register_ob11_pretender
-from ..pretender import OB11Pretender, event_handler, api_call_handler
+from ...factory import register_ob11_pretender
+from ...pretender import OB11Pretender, event_handler, api_call_handler
+from ....data.ob11_msg import OB11MsgModel, load_ob11_msg, save_ob11_msg
 
 log = logger_wrapper("OneBot V11 Pretender (RedProtocol)")
 
@@ -152,43 +154,75 @@ class RedOB11Pretender(OB11Pretender[RedAdapter, RedBot, red_event.Event]):
         message: Union[str, OB11Msg],
         **data: Dict,
     ) -> Dict:
-        if isinstance(message, OB11Msg):
-            message = self.convert_outgoing_msg(message)
-
         if message_type == "private":
-            chat = ChatType.FRIEND
-            target = user_id
+            return await self.send_private_msg(bot, user_id=user_id, message=message)
         elif message_type == "group":
-            chat = ChatType.GROUP
-            target = group_id
+            return await self.send_group_msg(bot, user_id=group_id, message=message)
         elif user_id:
-            chat = ChatType.FRIEND
-            target = user_id
+            return await self.send_private_msg(bot, user_id=user_id, message=message)
         elif group_id:
-            chat = ChatType.GROUP
-            target = group_id
+            return await self.send_group_msg(bot, user_id=group_id, message=message)
         else:
             raise ValueError("请传入正确的参数")
-
-        res = await bot.send_message(chat, target, message)
-        return {"message_id": int(res.msgId)}
 
     @api_call_handler()
     async def send_group_msg(
         self, bot: RedBot, *, group_id: int, message: Union[str, OB11Msg], **data: Dict
     ) -> Dict:
-        if isinstance(message, OB11Msg):
-            message = self.convert_outgoing_msg(message)
+        if isinstance(message, str):
+            message = OB11Msg(message)
+        ob11_msg = message
+
+        message = self.convert_outgoing_msg(message)
+
         res = await bot.send_group_message(group_id, message)
+        await save_ob11_msg(
+            res.msgId,
+            OB11MsgModel(
+                group=True,
+                group_id=group_id,
+                message_id=int(res.msgId),
+                real_id=int(res.msgId),
+                message_type="group",
+                sender=Sender(
+                    nickname=res.sendNickName or res.sendMemberName,
+                    user_id=int(bot.self_id),
+                ),
+                time=int(res.msgTime or "0"),
+                message=ob11_msg,
+                raw_message=ob11_msg.extract_plain_text(),
+            ),
+        )
         return {"message_id": int(res.msgId)}
 
     @api_call_handler()
     async def send_private_msg(
         self, bot: RedBot, *, user_id: int, message: Union[str, OB11Msg], **data: Dict
     ) -> Dict:
-        if isinstance(message, OB11Msg):
-            message = self.convert_outgoing_msg(message)
+        if isinstance(message, str):
+            message = OB11Msg(message)
+        ob11_msg = message
+
+        message = self.convert_outgoing_msg(message)
+
         res = await bot.send_friend_message(user_id, message)
+        await save_ob11_msg(
+            res.msgId,
+            OB11MsgModel(
+                group=False,
+                group_id=None,
+                message_id=int(res.msgId),
+                real_id=int(res.msgId),
+                message_type="private",
+                sender=Sender(
+                    nickname=res.sendNickName or res.sendMemberName,
+                    user_id=int(bot.self_id),
+                ),
+                time=int(res.msgTime or "0"),
+                message=ob11_msg,
+                raw_message=ob11_msg.extract_plain_text(),
+            ),
+        )
         return {"message_id": int(res.msgId)}
 
     @api_call_handler
@@ -199,15 +233,44 @@ class RedOB11Pretender(OB11Pretender[RedAdapter, RedBot, red_event.Event]):
             "nickname": profile.longNick or profile.nick,
         }
 
+    @api_call_handler()
+    async def get_msg(self, bot: RedBot, message_id: int, **data: Dict) -> Dict:
+        msg = await load_ob11_msg(str(message_id))
+        if msg is not None:
+            return json.loads(msg.json(exclude_none=True))
+        else:
+            raise ActionFailed(msg="消息不存在")
+
     @event_handler(red_event.GroupMessageEvent)
     async def handle_group_message_event(
         self, bot: RedBot, event: red_event.GroupMessageEvent
     ) -> ob11_event.GroupMessageEvent:
-        log("DEBUG", "Receive RedProtocol GroupMessageEvent: " + str(event))
-        log("TRACE", "RedProtocol GroupMessageEvent: " + str(event.json()))
-
         msg = self.convert_incoming_msg(event.message)
         ori_msg = self.convert_incoming_msg(event.original_message)
+
+        reply = None
+        if event.reply and event.reply.replayMsgId:
+            reply = await self.get_msg(bot, int(event.reply.replayMsgId))
+            if reply is not None:
+                reply = Reply.parse_obj(reply)
+
+        await save_ob11_msg(
+            event.msgId,
+            OB11MsgModel(
+                group=True,
+                group_id=int(event.peerUin or "0"),
+                message_id=int(event.msgId),
+                real_id=int(event.msgId),
+                message_type="group",
+                sender=Sender(
+                    nickname=event.sendNickName or event.sendMemberName,
+                    user_id=int(event.senderUin or "0"),
+                ),
+                time=int(event.msgTime or "0"),
+                message=msg,
+                raw_message=ori_msg.extract_plain_text(),
+            ),
+        )
 
         return ob11_event.GroupMessageEvent(
             time=int(event.msgTime or "0"),
@@ -232,7 +295,7 @@ class RedOB11Pretender(OB11Pretender[RedAdapter, RedBot, red_event.Event]):
             message_type="group",
             group_id=int(event.peerUin),
             to_me=event.to_me,
-            reply=None,
+            reply=reply,
             anonymous=None,
         )
 
@@ -240,9 +303,32 @@ class RedOB11Pretender(OB11Pretender[RedAdapter, RedBot, red_event.Event]):
     async def handle_private_message_event(
         self, bot: RedBot, event: red_event.PrivateMessageEvent
     ) -> ob11_event.PrivateMessageEvent:
-        log("DEBUG", "Receive RedProtocol PrivateMessageEvent: " + str(event))
         msg = self.convert_incoming_msg(event.message)
         ori_msg = self.convert_incoming_msg(event.original_message)
+
+        reply = None
+        if event.reply and event.reply.replayMsgId:
+            reply = Reply.parse_obj(
+                await self.get_msg(bot, int(event.reply.replayMsgId))
+            )
+
+        await save_ob11_msg(
+            event.msgId,
+            OB11MsgModel(
+                group=False,
+                message_id=int(event.msgId),
+                real_id=int(event.msgId),
+                message_type="private",
+                sender=Sender(
+                    nickname=event.sendNickName or event.sendMemberName,
+                    user_id=int(event.senderUin or "0"),
+                ),
+                time=int(event.msgTime or "0"),
+                message=msg,
+                raw_message=ori_msg.extract_plain_text(),
+            ),
+        )
+
         return ob11_event.PrivateMessageEvent(
             time=int(event.msgTime or "0"),
             self_id=int(bot.self_id or "0"),
@@ -262,5 +348,5 @@ class RedOB11Pretender(OB11Pretender[RedAdapter, RedBot, red_event.Event]):
             ),
             message_type="private",
             to_me=event.to_me,
-            reply=None,
+            reply=reply,
         )

@@ -18,6 +18,8 @@ packages = [
 python = "^3.8"
 nonebot2 = "^2.1.0"
 nonebot-adapter-onebot = "^2.3.0"
+nonebot-plugin-datastore = "^1.1.2"
+unqlite = "^0.9.6"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.0.275"

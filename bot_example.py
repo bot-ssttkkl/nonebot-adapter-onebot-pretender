@@ -1,14 +1,15 @@
 import nonebot
 from nonebot import on_command
 
+nonebot.init()
+
+# init_onebot_pretender 必须在 import adapter 之前
+
 from nonebot_adapter_onebot_pretender import (
     init_onebot_pretender,
     create_ob11_adapter_pretender,
 )
 
-# init_onebot_pretender 必须在 import adapter 之前
-
-nonebot.init()
 init_onebot_pretender()
 
 from nonebot.adapters.red import Adapter as RedAdapter

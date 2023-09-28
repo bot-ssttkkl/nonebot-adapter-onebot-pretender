@@ -9,6 +9,7 @@ from typing import (
     TypeVar,
     Callable,
     Optional,
+    ParamSpec,
 )
 
 from nonebot import logger
@@ -21,6 +22,9 @@ from nonebot.adapters.onebot.v11 import Event as OB11Event
 
 if TYPE_CHECKING:
     from .adapter import Adapter as OB11PretenderAdapter
+
+T = TypeVar("T")
+P = ParamSpec("P")
 
 T_ActualAdapter = TypeVar("T_ActualAdapter", bound=BaseAdapter)
 T_ActualBot = TypeVar("T_ActualBot", bound=BaseBot)
@@ -81,6 +85,17 @@ class OB11Pretender(
     async def handle_event(
         self, bot: T_ActualBot, event: T_ActualEvent
     ) -> Optional[OB11Event]:
+        self.log(
+            "DEBUG",
+            f"Receive {self.adapter.actual_adapter.get_name()}"
+            f" {type(event).__name__}: " + str(event),
+        )
+        self.log(
+            "TRACE",
+            f"{self.adapter.actual_adapter.get_name()}"
+            f" {type(event).__name__}: " + str(event.json()),
+        )
+
         handler = None
         for t_event in type(event).mro():
             handler = self._event_handler_mapping.get(t_event)
