@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 from base64 import b64decode
-from typing import Dict, Type, Union, Optional
+from typing import Dict, List, Type, Union, Optional
 
 from nonebot.utils import logger_wrapper
 from nonebot.adapters.red import Bot as RedBot
@@ -157,11 +157,11 @@ class RedOB11Pretender(OB11Pretender[RedAdapter, RedBot, red_event.Event]):
         if message_type == "private":
             return await self.send_private_msg(bot, user_id=user_id, message=message)
         elif message_type == "group":
-            return await self.send_group_msg(bot, user_id=group_id, message=message)
+            return await self.send_group_msg(bot, group_id=group_id, message=message)
         elif user_id:
             return await self.send_private_msg(bot, user_id=user_id, message=message)
         elif group_id:
-            return await self.send_group_msg(bot, user_id=group_id, message=message)
+            return await self.send_group_msg(bot, group_id=group_id, message=message)
         else:
             raise ValueError("请传入正确的参数")
 
@@ -225,13 +225,68 @@ class RedOB11Pretender(OB11Pretender[RedAdapter, RedBot, red_event.Event]):
         )
         return {"message_id": int(res.msgId)}
 
-    @api_call_handler
+    @api_call_handler()
     async def get_login_info(self, bot: RedBot, **data: Dict) -> Dict:
         profile = await bot.get_self_profile()
         return {
             "user_id": int(profile.uin or profile.uid or profile.qid),
             "nickname": profile.longNick or profile.nick,
         }
+
+    @api_call_handler()
+    async def get_friend_list(self, bot: RedBot, **data: Dict) -> List:
+        friends = await bot.get_friends()
+        return [
+            {
+                "user_id": int(profile.uin or profile.uid or profile.qid),
+                "nickname": profile.longNick or profile.nick,
+                "remark": profile.remark,
+            }
+            for profile in friends
+        ]
+
+    @api_call_handler()
+    async def get_group_list(self, bot: RedBot, **data: Dict) -> List:
+        groups = await bot.get_groups()
+        return [
+            {
+                "group_id": int(group.groupCode),
+                "group_name": group.groupName,
+                "group_memo": group.remarkName,
+                "group_create_time": 0,
+                "group_level": 0,
+                "member_count": group.memberCount,
+                "max_member_count": group.maxMember,
+            }
+            for group in groups
+        ]
+
+    @api_call_handler()
+    async def get_group_member_list(
+        self, bot: RedBot, group_id: int, **data: Dict
+    ) -> List:
+        members = await bot.get_members(group_id, 2**16 - 1)
+        return [
+            {
+                "group_id": group_id,
+                "user_id": int(member.uin or member.uid or member.qid),
+                "nickname": member.nick,
+                "card": member.cardName,
+                "sex": "unknown",
+                "age": 0,
+                "area": "",
+                "join_time": 0,
+                "last_sent_time": 0,
+                "level": 0,
+                "role": "member",  # TODO
+                "unfriendly": False,
+                "title": "",
+                "title_expire_time": 0,
+                "card_changeable": False,
+                "shut_up_timestamp": member.shutUpTime,
+            }
+            for member in members
+        ]
 
     @api_call_handler()
     async def get_msg(self, bot: RedBot, message_id: int, **data: Dict) -> Dict:
