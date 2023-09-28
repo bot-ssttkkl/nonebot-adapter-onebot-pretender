@@ -1,11 +1,14 @@
-from abc import ABC, abstractmethod
 from copy import copy
-from typing import Any, Generic, TYPE_CHECKING, Type, TypeVar, Optional
+from abc import ABC, abstractmethod
+from typing_extensions import override
+from typing import TYPE_CHECKING, Any, Type, Generic, TypeVar, Optional
 
 from nonebot import Driver
-from nonebot.adapters import Adapter as BaseAdapter, Bot as BaseBot, Event as BaseEvent
-from nonebot.adapters.onebot.v11 import Adapter as OB11Adapter, Bot as OB11Bot
-from typing_extensions import override
+from nonebot.adapters import Bot as BaseBot
+from nonebot.adapters import Event as BaseEvent
+from nonebot.adapters import Adapter as BaseAdapter
+from nonebot.adapters.onebot.v11 import Bot as OB11Bot
+from nonebot.adapters.onebot.v11 import Adapter as OB11Adapter
 
 from ..patch_handle_event import patch_event_handle, origin_handle_event
 

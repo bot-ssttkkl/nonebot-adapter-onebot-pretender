@@ -2,8 +2,8 @@ import nonebot
 from nonebot import on_command
 
 from nonebot_adapter_onebot_pretender import (
-    create_ob11_adapter_pretender,
     init_onebot_pretender,
+    create_ob11_adapter_pretender,
 )
 
 # init_onebot_pretender 必须在 import adapter 之前

@@ -1,10 +1,11 @@
-from typing import Type, Callable, Dict, Any
+from typing import Any, Dict, Type, Callable
 
-from nonebot import Adapter as BaseAdapter, Driver
+from nonebot import Driver
+from nonebot import Adapter as BaseAdapter
 from nonebot.adapters.onebot.v11 import Adapter as OB11Adapter
 
-from .adapter import Adapter as OB11PretenderAdapter
 from .pretender import OB11Pretender
+from .adapter import Adapter as OB11PretenderAdapter
 
 _pretenders: Dict[str, Type[OB11Pretender]] = {}
 

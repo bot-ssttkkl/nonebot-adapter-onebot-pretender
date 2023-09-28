@@ -1,23 +1,23 @@
-from abc import abstractmethod, ABCMeta
+from abc import ABCMeta, abstractmethod
 from typing import (
-    TypeVar,
-    Generic,
-    Type,
-    Any,
-    Callable,
     TYPE_CHECKING,
+    Any,
     Dict,
-    Optional,
+    Type,
     Tuple,
+    Generic,
+    TypeVar,
+    Callable,
+    Optional,
 )
 
 from nonebot import logger
-from nonebot.adapters import Adapter as BaseAdapter, Bot as BaseBot, Event as BaseEvent
-from nonebot.adapters.onebot.v11 import (
-    Bot as OB11Bot,
-    Event as OB11Event,
-    ApiNotAvailable,
-)
+from nonebot.adapters import Bot as BaseBot
+from nonebot.adapters import Event as BaseEvent
+from nonebot.adapters import Adapter as BaseAdapter
+from nonebot.adapters.onebot.v11 import Bot as OB11Bot
+from nonebot.adapters.onebot.v11 import ApiNotAvailable
+from nonebot.adapters.onebot.v11 import Event as OB11Event
 
 if TYPE_CHECKING:
     from .adapter import Adapter as OB11PretenderAdapter

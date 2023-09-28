@@ -1,18 +1,21 @@
-from base64 import b64decode
 from pathlib import Path
-from typing import Type, Dict, Optional, Union
+from base64 import b64decode
+from typing import Dict, Type, Union, Optional
 
-from nonebot.adapters.onebot.v11 import Message as OB11Msg, MessageSegment as OB11MS
-from nonebot.adapters.onebot.v11 import event as ob11_event
-from nonebot.adapters.onebot.v11.event import Sender
-from nonebot.adapters.red import Adapter as RedAdapter, Bot as RedBot
-from nonebot.adapters.red import Message as RedMsg, MessageSegment as RedMS
+from nonebot.utils import logger_wrapper
+from nonebot.adapters.red import Bot as RedBot
+from nonebot.adapters.red import Message as RedMsg
 from nonebot.adapters.red import event as red_event
 from nonebot.adapters.red.api.model import ChatType
-from nonebot.utils import logger_wrapper
+from nonebot.adapters.onebot.v11.event import Sender
+from nonebot.adapters.red import Adapter as RedAdapter
+from nonebot.adapters.red import MessageSegment as RedMS
+from nonebot.adapters.onebot.v11 import Message as OB11Msg
+from nonebot.adapters.onebot.v11 import event as ob11_event
+from nonebot.adapters.onebot.v11 import MessageSegment as OB11MS
 
 from ..factory import register_ob11_pretender
-from ..pretender import OB11Pretender, api_call_handler, event_handler
+from ..pretender import OB11Pretender, event_handler, api_call_handler
 
 log = logger_wrapper("OneBot V11 Pretender (RedProtocol)")
 

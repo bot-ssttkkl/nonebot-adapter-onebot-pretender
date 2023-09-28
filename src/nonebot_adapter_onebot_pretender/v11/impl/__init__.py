@@ -1,2 +1,2 @@
 def init_ob11_pretender_impl():
-    pass
+    from . import red_pretender  # noqa: F401
