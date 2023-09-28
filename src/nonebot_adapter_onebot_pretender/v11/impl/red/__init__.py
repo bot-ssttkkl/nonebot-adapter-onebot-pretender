@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 from base64 import b64decode
+from datetime import datetime
 from urllib.parse import urlencode, urlunsplit
 from typing import Dict, List, Type, Union, Optional
 
@@ -498,7 +499,7 @@ class RedOB11Pretender(OB11Pretender[RedAdapter, RedBot, red_event.Event]):
             time=int(event.msgTime or "0"),
             self_id=int(bot.self_id or "0"),
             post_type="message",
-            sub_type="normal",
+            sub_type="friend",
             user_id=int(event.senderUin or "0"),
             message_id=int(event.msgId or "0"),
             message=msg,
@@ -514,4 +515,51 @@ class RedOB11Pretender(OB11Pretender[RedAdapter, RedBot, red_event.Event]):
             message_type="private",
             to_me=event.to_me,
             reply=reply,
+        )
+
+    @event_handler(red_event.MemberAddEvent)
+    async def handle_member_add_event(
+        self, bot: RedBot, event: red_event.MemberAddEvent
+    ) -> ob11_event.GroupIncreaseNoticeEvent:
+        return ob11_event.GroupIncreaseNoticeEvent(
+            time=int(event.msgTime or "0"),
+            self_id=int(bot.self_id or "0"),
+            post_type="notice",
+            notice_type="group_increase",
+            sub_type="approve",
+            user_id=int(event.memberUid or "0"),
+            group_id=int(event.peerUin or event.peerUid or "0"),
+            operator_id=int(event.operatorUid or "0"),
+        )
+
+    @event_handler(red_event.MemberMutedEvent)
+    async def handle_member_muted_event(
+        self, bot: RedBot, event: red_event.MemberMutedEvent
+    ) -> ob11_event.GroupBanNoticeEvent:
+        return ob11_event.GroupBanNoticeEvent(
+            time=int(datetime.now().timestamp()),
+            self_id=int(bot.self_id or "0"),
+            post_type="notice",
+            notice_type="group_ban",
+            sub_type="ban",
+            user_id=int(event.member.uin or event.member.uid or "0"),
+            group_id=int(event.peerUin or event.peerUid or "0"),
+            operator_id=int(event.operator.uin or event.operator.uid or "0"),
+            duration=int(event.duration.total_seconds()),
+        )
+
+    @event_handler(red_event.MemberUnmuteEvent)
+    async def handle_member_unmuted_event(
+        self, bot: RedBot, event: red_event.MemberUnmuteEvent
+    ) -> ob11_event.GroupBanNoticeEvent:
+        return ob11_event.GroupBanNoticeEvent(
+            time=int(datetime.now().timestamp()),
+            self_id=int(bot.self_id or "0"),
+            post_type="notice",
+            notice_type="group_ban",
+            sub_type="lift_ban",
+            user_id=int(event.member.uin or event.member.uid or "0"),
+            group_id=int(event.peerUin or event.peerUid or "0"),
+            operator_id=int(event.operator.uin or event.operator.uid or "0"),
+            duration=int(event.duration.total_seconds()),
         )
