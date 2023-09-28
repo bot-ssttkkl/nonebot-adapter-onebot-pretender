@@ -1,6 +1,7 @@
-from typing import Type, Callable, Dict
+from typing import Type, Callable, Dict, Any
 
-from nonebot import Adapter as BaseAdapter
+from nonebot import Adapter as BaseAdapter, Driver
+from nonebot.adapters.onebot.v11 import Adapter as OB11Adapter
 
 from .adapter import Adapter as OB11PretenderAdapter
 from .pretender import OB11Pretender
@@ -17,15 +18,26 @@ def register_ob11_pretender(adapter: Type[BaseAdapter]) -> Callable[[Type[OB11Pr
     return decorator
 
 
-def create_ob11_adapter_pretender(adapter: Type[BaseAdapter]) -> Type[OB11PretenderAdapter]:
-    PretenderImpl = _pretenders.get(adapter.get_name())
-    if PretenderImpl is None:
-        raise RuntimeError(f"未找到 {adapter.get_name()} 的 Pretender 实现")
+def create_ob11_adapter_pretender(*adapter: Type[BaseAdapter]) -> Type[OB11PretenderAdapter]:
+    pretender_adapters = []
 
-    class Adapter(OB11PretenderAdapter):
-        @classmethod
-        def get_pretender_type(cls) -> Type[OB11Pretender]:
-            return PretenderImpl
+    for actual_adapter in adapter:
+        pretender = _pretenders.get(actual_adapter.get_name())
+        if pretender is None:
+            raise RuntimeError(f"未找到 {actual_adapter.get_name()} 的 Pretender 实现")
+
+        class Adapter(OB11PretenderAdapter):
+            @classmethod
+            def get_pretender_type(cls):
+                return pretender
+
+        pretender_adapters.append(Adapter)
+
+    class Adapter(OB11Adapter):
+        def __init__(self, driver: Driver, **kwargs: Any):
+            self.pretender_adapters = []
+            for adp in pretender_adapters:
+                self.pretender_adapters.append(adp(driver, **kwargs))
 
     return Adapter
 

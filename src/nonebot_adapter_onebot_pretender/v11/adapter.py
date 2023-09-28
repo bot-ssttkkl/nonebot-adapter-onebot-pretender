@@ -3,8 +3,8 @@ from copy import copy
 from typing import Any, Generic, TYPE_CHECKING, Type, TypeVar, Optional
 
 from nonebot import Driver
-from nonebot.adapters import (Adapter as BaseAdapter, Bot as BaseBot, Event as BaseEvent)
-from nonebot.adapters.onebot.v11 import (Adapter as OB11Adapter, Bot as OB11Bot)
+from nonebot.adapters import Adapter as BaseAdapter, Bot as BaseBot, Event as BaseEvent
+from nonebot.adapters.onebot.v11 import Adapter as OB11Adapter, Bot as OB11Bot
 from typing_extensions import override
 
 from ..patch_handle_event import patch_event_handle, origin_handle_event
@@ -23,6 +23,7 @@ class Adapter(OB11Adapter, Generic[T_ActualAdapter, T_ActualBot], ABC):
         self.pretender = self.get_pretender_type()(self)
         self.actual_adapter = self._create_actual_adapter_with_hack(driver, **kwargs)
 
+    def _setup(self) -> None:
         @patch_event_handle
         async def handle_event(bot: BaseBot, event: BaseEvent) -> bool:
             if bot.self_id in self.actual_adapter.bots:
@@ -43,12 +44,6 @@ class Adapter(OB11Adapter, Generic[T_ActualAdapter, T_ActualBot], ABC):
     @abstractmethod
     def get_pretender_type(cls) -> Type["OB11Pretender[T_ActualAdapter, T_ActualBot]"]:
         ...
-
-    @classmethod
-    @override
-    def get_name(cls) -> str:
-        """适配器名称"""
-        return f"OneBot V11 Pretender ({cls.get_pretender_type().get_actual_adapter_type().get_name()})"
 
     def get_actual_bot(self, bot: OB11Bot) -> Optional[T_ActualBot]:
         return self.actual_adapter.bots.get(bot.self_id)
