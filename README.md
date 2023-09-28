@@ -29,6 +29,19 @@ With some magic ✨
     - [ ] 全体禁言
     - [ ] 获取历史消息
 
+# 测试过的版本
+
+- nonebot2                              2.1.0
+- nonebot-adapter-onebot                2.3.0
+- nonebot-adapter-red                   0.5.1
+
+由于本项目的特殊性，不保证在其他版本的nonebot/red适配器中也能工作。
+
+# DEMO
+
+1、创建一个bot.py
+
+2、写入下列内容
 ```python
 import nonebot
 from nonebot import on_command
@@ -57,3 +70,6 @@ if __name__ == "__main__":
     nonebot.run()
 
 ```
+
+3、开润
+
