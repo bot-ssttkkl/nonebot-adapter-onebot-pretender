@@ -9,7 +9,9 @@ from .pretender import OB11Pretender
 _pretenders: Dict[str, Type[OB11Pretender]] = {}
 
 
-def register_ob11_pretender(adapter: Type[BaseAdapter]) -> Callable[[Type[OB11Pretender]], Type[OB11Pretender]]:
+def register_ob11_pretender(
+    adapter: Type[BaseAdapter],
+) -> Callable[[Type[OB11Pretender]], Type[OB11Pretender]]:
     def decorator(pretender: Type[OB11Pretender]) -> Type[OB11Pretender]:
         _pretenders[adapter.get_name()] = pretender
 
@@ -18,7 +20,9 @@ def register_ob11_pretender(adapter: Type[BaseAdapter]) -> Callable[[Type[OB11Pr
     return decorator
 
 
-def create_ob11_adapter_pretender(*adapter: Type[BaseAdapter]) -> Type[OB11PretenderAdapter]:
+def create_ob11_adapter_pretender(
+    *adapter: Type[BaseAdapter],
+) -> Type[OB11PretenderAdapter]:
     pretender_adapters = []
 
     for actual_adapter in adapter:

@@ -2,7 +2,6 @@ from base64 import b64decode
 from pathlib import Path
 from typing import Type, Dict, Optional, Union
 
-from nonebot.adapters.onebot.v11 import Bot as OB11Bot
 from nonebot.adapters.onebot.v11 import Message as OB11Msg, MessageSegment as OB11MS
 from nonebot.adapters.onebot.v11 import event as ob11_event
 from nonebot.adapters.onebot.v11.event import Sender
@@ -59,11 +58,13 @@ class RedOB11Pretender(OB11Pretender[RedAdapter, RedBot, red_event.Event]):
                     file = Path(file)
                 msg.append(RedMS.voice(file))
             elif m.type == "reply":
-                msg.append(RedMS.reply(
-                    m.data.get("seq"),
-                    m.data.get("id"),
-                    m.data.get("qq"),
-                ))
+                msg.append(
+                    RedMS.reply(
+                        m.data.get("seq"),
+                        m.data.get("id"),
+                        m.data.get("qq"),
+                    )
+                )
             else:
                 log("WARNING", f"暂不支持 {m.type} 类型消息转换 (OB11 -> Red)")
         return msg
@@ -74,56 +75,80 @@ class RedOB11Pretender(OB11Pretender[RedAdapter, RedBot, red_event.Event]):
             if m.type == "text":
                 msg.append(OB11MS.text(m.data["text"]))
             elif m.type == "at":
-                msg.append(OB11MS("at", {
-                    "qq": str(m.data["user_id"]),
-                    "name": m.data.get("user_name")
-                }))
+                msg.append(
+                    OB11MS(
+                        "at",
+                        {"qq": str(m.data["user_id"]), "name": m.data.get("user_name")},
+                    )
+                )
             elif m.type == "at_all":
                 msg.append(OB11MS.at("all"))
             elif m.type == "face":
-                msg.append(OB11MS("face", {
-                    "id": str(m.data["face_id"])
-                }))
+                msg.append(OB11MS("face", {"id": str(m.data["face_id"])}))
             elif m.type == "market_face":
-                msg.append(OB11MS("image", {
-                    "file": m.data["emoji_id"] + "_aio.image",
-                    "url": "file://" + m.data["static_path"]
-                }))
+                msg.append(
+                    OB11MS(
+                        "image",
+                        {
+                            "file": m.data["emoji_id"] + "_aio.image",
+                            "url": "file://" + m.data["static_path"],
+                        },
+                    )
+                )
             elif m.type == "image":
-                msg.append(OB11MS("image", {
-                    "file": m.data["md5"] + ".image",
-                    "url": "file://" + m.data["path"]
-                }))
+                msg.append(
+                    OB11MS(
+                        "image",
+                        {
+                            "file": m.data["md5"] + ".image",
+                            "url": "file://" + m.data["path"],
+                        },
+                    )
+                )
             elif m.type == "video":
-                msg.append(OB11MS("video", {
-                    "file": m.data["name"],
-                    "url": "file://" + m.data["path"],
-                    "cover": "file://" + m.data["thumb_path"]
-                }))
+                msg.append(
+                    OB11MS(
+                        "video",
+                        {
+                            "file": m.data["name"],
+                            "url": "file://" + m.data["path"],
+                            "cover": "file://" + m.data["thumb_path"],
+                        },
+                    )
+                )
             elif m.type == "voice":
-                msg.append(OB11MS("record", {
-                    "file": m.data["name"],
-                    "url": "file://" + m.data["path"]
-                }))
+                msg.append(
+                    OB11MS(
+                        "record",
+                        {"file": m.data["name"], "url": "file://" + m.data["path"]},
+                    )
+                )
             elif m.type == "reply":
-                msg.append(OB11MS("reply", {
-                    "id": str(m.data["msg_id"]),
-                }))
+                msg.append(
+                    OB11MS(
+                        "reply",
+                        {
+                            "id": str(m.data["msg_id"]),
+                        },
+                    )
+                )
             elif m.type == "forward":
-                msg.append(OB11MS("forward", {
-                    "id": str(m.data["id"])
-                }))
+                msg.append(OB11MS("forward", {"id": str(m.data["id"])}))
             else:
                 log("WARNING", f"暂不支持 {m.type} 类型消息转换 (Red -> OB11)")
         return msg
 
     @api_call_handler()
-    async def send_msg(self, bot: RedBot, *,
-                       message_type: Optional[str] = None,
-                       user_id: Optional[int] = None,
-                       group_id: Optional[int] = None,
-                       message: Union[str, OB11Msg],
-                       **data: Dict) -> Dict:
+    async def send_msg(
+        self,
+        bot: RedBot,
+        *,
+        message_type: Optional[str] = None,
+        user_id: Optional[int] = None,
+        group_id: Optional[int] = None,
+        message: Union[str, OB11Msg],
+        **data: Dict,
+    ) -> Dict:
         if isinstance(message, OB11Msg):
             message = self.convert_outgoing_msg(message)
 
@@ -142,56 +167,39 @@ class RedOB11Pretender(OB11Pretender[RedAdapter, RedBot, red_event.Event]):
         else:
             raise ValueError("请传入正确的参数")
 
-        res = await bot.send_message(
-            chat,
-            target,
-            message
-        )
-        return {
-            "message_id": int(res.msgId)
-        }
+        res = await bot.send_message(chat, target, message)
+        return {"message_id": int(res.msgId)}
 
     @api_call_handler()
-    async def send_group_msg(self, bot: RedBot, *,
-                             group_id: int,
-                             message: Union[str, OB11Msg],
-                             **data: Dict) -> Dict:
+    async def send_group_msg(
+        self, bot: RedBot, *, group_id: int, message: Union[str, OB11Msg], **data: Dict
+    ) -> Dict:
         if isinstance(message, OB11Msg):
             message = self.convert_outgoing_msg(message)
-        res = await bot.send_group_message(
-            group_id,
-            message
-        )
-        return {
-            "message_id": int(res.msgId)
-        }
+        res = await bot.send_group_message(group_id, message)
+        return {"message_id": int(res.msgId)}
 
     @api_call_handler()
-    async def send_private_msg(self, bot: RedBot, *,
-                               user_id: int,
-                               message: Union[str, OB11Msg],
-                               **data: Dict) -> Dict:
+    async def send_private_msg(
+        self, bot: RedBot, *, user_id: int, message: Union[str, OB11Msg], **data: Dict
+    ) -> Dict:
         if isinstance(message, OB11Msg):
             message = self.convert_outgoing_msg(message)
-        res = await bot.send_friend_message(
-            user_id,
-            message
-        )
-        return {
-            "message_id": int(res.msgId)
-        }
+        res = await bot.send_friend_message(user_id, message)
+        return {"message_id": int(res.msgId)}
 
     @api_call_handler
     async def get_login_info(self, bot: RedBot, **data: Dict) -> Dict:
         profile = await bot.get_self_profile()
         return {
             "user_id": int(profile.uin or profile.uid or profile.qid),
-            "nickname": profile.longNick or profile.nick
+            "nickname": profile.longNick or profile.nick,
         }
 
     @event_handler(red_event.GroupMessageEvent)
-    async def handle_group_message_event(self, bot: RedBot,
-                                         event: red_event.GroupMessageEvent) -> ob11_event.GroupMessageEvent:
+    async def handle_group_message_event(
+        self, bot: RedBot, event: red_event.GroupMessageEvent
+    ) -> ob11_event.GroupMessageEvent:
         log("DEBUG", "Receive RedProtocol GroupMessageEvent: " + str(event))
         log("TRACE", "RedProtocol GroupMessageEvent: " + str(event.json()))
 
@@ -216,17 +224,19 @@ class RedOB11Pretender(OB11Pretender[RedAdapter, RedBot, red_event.Event]):
                 age=0,
                 card=event.sendMemberName,
                 role="member",  # todo
-                title=""
+                title="",
             ),
             message_type="group",
             group_id=int(event.peerUin),
             to_me=event.to_me,
             reply=None,
-            anonymous=None)
+            anonymous=None,
+        )
 
     @event_handler(red_event.PrivateMessageEvent)
-    async def handle_private_message_event(self, bot: RedBot,
-                                           event: red_event.PrivateMessageEvent) -> ob11_event.PrivateMessageEvent:
+    async def handle_private_message_event(
+        self, bot: RedBot, event: red_event.PrivateMessageEvent
+    ) -> ob11_event.PrivateMessageEvent:
         log("DEBUG", "Receive RedProtocol PrivateMessageEvent: " + str(event))
         msg = self.convert_incoming_msg(event.message)
         ori_msg = self.convert_incoming_msg(event.original_message)
@@ -245,7 +255,7 @@ class RedOB11Pretender(OB11Pretender[RedAdapter, RedBot, red_event.Event]):
                 user_id=int(event.senderUin or "0"),
                 nickname=event.sendNickName or event.sendMemberName,
                 sex="unknown",
-                age=0
+                age=0,
             ),
             message_type="private",
             to_me=event.to_me,

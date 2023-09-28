@@ -1,9 +1,23 @@
 from abc import abstractmethod, ABCMeta
-from typing import TypeVar, Generic, Type, Any, Callable, TYPE_CHECKING, Dict, Optional, Tuple
+from typing import (
+    TypeVar,
+    Generic,
+    Type,
+    Any,
+    Callable,
+    TYPE_CHECKING,
+    Dict,
+    Optional,
+    Tuple,
+)
 
 from nonebot import logger
 from nonebot.adapters import Adapter as BaseAdapter, Bot as BaseBot, Event as BaseEvent
-from nonebot.adapters.onebot.v11 import Bot as OB11Bot, Event as OB11Event, ApiNotAvailable
+from nonebot.adapters.onebot.v11 import (
+    Bot as OB11Bot,
+    Event as OB11Event,
+    ApiNotAvailable,
+)
 
 if TYPE_CHECKING:
     from .adapter import Adapter as OB11PretenderAdapter
@@ -17,7 +31,9 @@ T_EventHandler = Callable[["OB11Pretender", T_ActualBot, T_ActualEvent], OB11Eve
 
 
 class OB11PretenderMeta(ABCMeta):
-    def __new__(mcls, name: str, base: Tuple[type, ...], namespace: dict, *args, **kwargs):
+    def __new__(
+        mcls, name: str, base: Tuple[type, ...], namespace: dict, *args, **kwargs
+    ):
         api_call_handlers = {}
 
         for item in namespace.values():
@@ -37,7 +53,9 @@ class OB11PretenderMeta(ABCMeta):
         return super().__new__(mcls, name, base, namespace, **kwargs)
 
 
-class OB11Pretender(Generic[T_ActualAdapter, T_ActualBot, T_ActualEvent], metaclass=OB11PretenderMeta):
+class OB11Pretender(
+    Generic[T_ActualAdapter, T_ActualBot, T_ActualEvent], metaclass=OB11PretenderMeta
+):
     _api_call_handler_mapping: Dict[str, T_ApiHandler]
     _event_handler_mapping: Dict[Type[BaseEvent], T_EventHandler]
 
@@ -60,7 +78,9 @@ class OB11Pretender(Generic[T_ActualAdapter, T_ActualBot, T_ActualEvent], metacl
         actual_bot = self.adapter.get_actual_bot(bot)
         return await handler(self, actual_bot, **data)
 
-    async def handle_event(self, bot: T_ActualBot, event: T_ActualEvent) -> Optional[OB11Event]:
+    async def handle_event(
+        self, bot: T_ActualBot, event: T_ActualEvent
+    ) -> Optional[OB11Event]:
         handler = None
         for t_event in type(event).mro():
             handler = self._event_handler_mapping.get(t_event)

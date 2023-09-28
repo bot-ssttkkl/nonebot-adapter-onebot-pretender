@@ -31,8 +31,9 @@ class Adapter(OB11Adapter, Generic[T_ActualAdapter, T_ActualBot], ABC):
                 if handled_event is None:
                     self.pretender.log(
                         "WARNING",
-                        f"No event handler for {type(event).__name__} ({self.actual_adapter.get_name()}) found, "
-                        f"event was ignored"
+                        f"No event handler for {type(event).__name__} "
+                        f"({self.actual_adapter.get_name()}) found, "
+                        f"event was ignored",
                     )
                 else:
                     await origin_handle_event(self.bots[bot.self_id], handled_event)
@@ -48,7 +49,9 @@ class Adapter(OB11Adapter, Generic[T_ActualAdapter, T_ActualBot], ABC):
     def get_actual_bot(self, bot: OB11Bot) -> Optional[T_ActualBot]:
         return self.actual_adapter.bots.get(bot.self_id)
 
-    def _create_actual_adapter_with_hack(self, driver: Driver, **kwargs: Any) -> T_ActualAdapter:
+    def _create_actual_adapter_with_hack(
+        self, driver: Driver, **kwargs: Any
+    ) -> T_ActualAdapter:
         pretender_adapter = self
 
         hacky_driver = copy(driver)
@@ -61,7 +64,9 @@ class Adapter(OB11Adapter, Generic[T_ActualAdapter, T_ActualBot], ABC):
 
         def bot_disconnect(bot: T_ActualBot) -> None:
             pretender_bot = pretender_adapter.bots.get(bot.self_id)
-            assert pretender_bot is not None, f"cannot find pretender bot {bot.self_id} ({bot.type})"
+            assert (
+                pretender_bot is not None
+            ), f"cannot find pretender bot {bot.self_id} ({bot.type})"
             pretender_adapter.bot_disconnect(pretender_bot)
 
         hacky_driver._bot_disconnect = bot_disconnect
