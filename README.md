@@ -24,9 +24,9 @@ With some magic ✨
     - [x] 获取好友、群组get_friend_list/get_group_list
     - [x] 消息撤回
     - [ ] 获取群组内群员资料get_group_member_list（调不通orz [https://github.com/chrononeko/bugtracker/issues/12]）
+    - [x] 禁言/解禁群员
+    - [x] 全体禁言
     - [ ] 获取群公告
-    - [ ] 禁言/解禁群员
-    - [ ] 全体禁言
     - [ ] 获取历史消息
 
 # 测试过的版本
