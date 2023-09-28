@@ -2,33 +2,6 @@
 
 With some magic ✨
 
-- RedProtocol
-  - [x] 消息接收
-    - [x] 纯文本
-    - [x] 图片、视频、语音
-    - [x] 引用
-    - [x] 表情
-  - [x] 消息发送
-    - [x] 纯文本
-    - [x] 图片、视频、语音
-    - [x] 引用
-    - [x] 表情
-    - [ ] 合并转发（调不通orz）
-  - [ ] 消息发送者角色判断（消息上报少字段orz）
-  - [ ] 其他OB11事件
-    - [x] 群成员禁言/解除禁言事件
-    - [x] 群成员加入事件 (包括旧版受邀请入群)
-    - [ ] 群名称改动事件
-  - [ ] 其他OB11 API
-    - [x] 获取自身资料get_login_info
-    - [x] 获取好友、群组get_friend_list/get_group_list
-    - [x] 消息撤回
-    - [ ] 获取群组内群员资料get_group_member_list（调不通orz [https://github.com/chrononeko/bugtracker/issues/12]）
-    - [x] 禁言/解禁群员
-    - [x] 全体禁言
-    - [ ] 获取群公告
-    - [ ] 获取历史消息
-
 # 测试过的版本
 
 - nonebot2 2.1.0
@@ -73,3 +46,32 @@ if __name__ == "__main__":
 ```
 
 3、开润
+
+# 已支持
+
+- RedProtocol
+  - [x] 消息接收
+    - [x] 纯文本
+    - [x] 图片、视频、语音
+    - [x] 引用
+    - [x] 表情
+  - [x] 消息发送
+    - [x] 纯文本
+    - [x] 图片、视频、语音
+    - [x] 引用
+    - [x] 表情
+    - [ ] 合并转发（调不通orz）
+  - [ ] 消息发送者角色判断（消息上报少字段orz）
+  - [ ] 其他OB11事件
+    - [x] 群成员禁言/解除禁言事件
+    - [x] 群成员加入事件 (包括旧版受邀请入群)
+    - [ ] 群名称改动事件
+  - [ ] 其他OB11 API
+    - [x] 获取自身资料get_login_info
+    - [x] 获取好友、群组get_friend_list/get_group_list
+    - [x] 消息撤回
+    - [ ] 获取群组内群员资料get_group_member_list（调不通orz [https://github.com/chrononeko/bugtracker/issues/12]）
+    - [x] 禁言/解禁群员
+    - [x] 全体禁言
+    - [ ] 获取群公告
+    - [ ] 获取历史消息
