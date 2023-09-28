@@ -1,5 +1,4 @@
-nonebot-adapter-onebot-pretender
-======
+# nonebot-adapter-onebot-pretender
 
 With some magic ✨
 
@@ -17,23 +16,24 @@ With some magic ✨
     - [ ] 合并转发（调不通orz）
   - [ ] 消息发送者角色判断（消息上报少字段orz）
   - [ ] 其他OB11事件
+    - [x] 群成员禁言/解除禁言事件
+    - [x] 群成员加入事件 (包括旧版受邀请入群)
     - [ ] 群名称改动事件
-    - [ ] 群成员禁言/解除禁言事件
-    - [ ] 群成员加入事件 (包括旧版受邀请入群)
   - [ ] 其他OB11 API
     - [x] 获取自身资料get_login_info
     - [x] 获取好友、群组get_friend_list/get_group_list
+    - [x] 消息撤回
     - [ ] 获取群组内群员资料get_group_member_list（调不通orz [https://github.com/chrononeko/bugtracker/issues/12]）
+    - [x] 禁言/解禁群员
+    - [x] 全体禁言
     - [ ] 获取群公告
-    - [ ] 禁言/解禁群员
-    - [ ] 全体禁言
     - [ ] 获取历史消息
 
 # 测试过的版本
 
-- nonebot2                              2.1.0
-- nonebot-adapter-onebot                2.3.0
-- nonebot-adapter-red                   0.5.1
+- nonebot2 2.1.0
+- nonebot-adapter-onebot 2.3.0
+- nonebot-adapter-red 0.5.1
 
 由于本项目的特殊性，不保证在其他版本的nonebot/red适配器中也能工作。
 
@@ -42,6 +42,7 @@ With some magic ✨
 1、创建一个bot.py
 
 2、写入下列内容
+
 ```python
 import nonebot
 from nonebot import on_command
@@ -72,4 +73,3 @@ if __name__ == "__main__":
 ```
 
 3、开润
-
