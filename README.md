@@ -3,6 +3,20 @@ nonebot-adapter-onebot-pretender
 
 With some magic ✨
 
+- RedProtocol
+  - [x] 消息接收
+    - [x] 纯文本
+    - [ ] 图片、视频、语音
+    - [x] 引用
+    - [x] 表情
+  - [x] 消息发送
+    - [x] 纯文本
+    - [x] 图片、视频、语音
+    - [x] 引用
+    - [x] 表情
+  - [ ] 消息发送者角色判断（群主、管理员）
+  - [ ] 其他OB11 API
+
 ```python
 import nonebot
 from nonebot import on_command
