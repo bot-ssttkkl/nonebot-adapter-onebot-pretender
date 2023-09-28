@@ -1,5 +1,3 @@
-import json
-
 import nonebot
 from nonebot import on_command
 
@@ -26,13 +24,7 @@ nonebot.load_from_toml("pyproject.toml")
 
 @on_command("hello").handle()
 async def handle_hello(bot: Bot, event: MessageEvent):
-    await bot.send(event, "world")
-
-
-@on_command("get_group_list").handle()
-async def handle(bot: Bot, event: MessageEvent):
-    res = await bot.get_group_list()
-    await bot.send(event, json.dumps(res))
+    await bot.send(event, event.message)
 
 
 if __name__ == "__main__":

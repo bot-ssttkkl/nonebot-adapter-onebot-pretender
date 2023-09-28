@@ -1,8 +1,8 @@
-from typing import Optional
 from asyncio import create_task
+from typing import List, Literal, Optional
 
 from nonebot import logger
-from pydantic import BaseModel
+from pydantic import Field, BaseModel
 from nonebot.adapters.onebot.v11 import Message
 from nonebot.adapters.onebot.v11.event import Sender
 from nonebot.utils import DataclassEncoder, run_sync
@@ -11,15 +11,16 @@ from nonebot_adapter_onebot_pretender.data import db
 
 
 class OB11MsgModel(BaseModel):
-    group: bool
-    group_id: Optional[int]
     message_id: int
-    real_id: int
-    message_type: str
-    sender: Sender
-    time: int
-    message: Message
-    raw_message: str
+    group: bool = False
+    group_id: Optional[int]
+    real_id: int = 0
+    message_type: Literal["group", "private"]
+    sender: Sender = Field(default_factory=Sender)
+    time: int = 0
+    message: Message = Field(default_factory=Message)
+    raw_message: str = ""
+    forward: Optional[List[dict]]
 
     class Config:
         extra = "allow"
@@ -43,5 +44,5 @@ def _do_save_ob11_msg(message_id: str, message: OB11MsgModel):
     logger.debug(f"Saved OB11 Msg: {message.dict()}")
 
 
-async def save_ob11_msg(message_id: str, message: OB11MsgModel):
+def save_ob11_msg(message_id: str, message: OB11MsgModel):
     create_task(_do_save_ob11_msg(message_id, message))

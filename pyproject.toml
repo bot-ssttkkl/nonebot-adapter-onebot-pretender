@@ -37,6 +37,7 @@ nonebot-adapter-red = "^0.5.0"
 [tool.poetry.group.test_plugins.dependencies]
 nonebot-plugin-escape-url = { version = "*", python = "^3.9" }
 nonebot-plugin-access-control = { version = "*", python = "^3.9" }
+nonebot-plugin-pixivbot = { version = ">= 2.0.4", python = "^3.9" }
 nonebot-plugin-mahjong-utils = { version = ">= 0.4.3", extras = ["htmlrender"], python = "^3.9" }
 
 [tool.black]
@@ -69,7 +70,8 @@ mark-parentheses = false
 plugins = [
   "nonebot_plugin_escape_url",
   "nonebot_plugin_access_control",
-  "nonebot_plugin_mahjong_utils"
+  "nonebot_plugin_mahjong_utils",
+  "nonebot_plugin_pixivbot"
 ]
 
 [build-system]
