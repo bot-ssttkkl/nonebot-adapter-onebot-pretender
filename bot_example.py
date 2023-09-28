@@ -1,14 +1,15 @@
 import nonebot
 from nonebot import on_command
 
-from nonebot_adapter_onebot_pretender import (
-    create_ob11_adapter_pretender,
-    init_onebot_pretender,
-)
+nonebot.init()
 
 # init_onebot_pretender 必须在 import adapter 之前
 
-nonebot.init()
+from nonebot_adapter_onebot_pretender import (
+    init_onebot_pretender,
+    create_ob11_adapter_pretender,
+)
+
 init_onebot_pretender()
 
 from nonebot.adapters.red import Adapter as RedAdapter
@@ -23,7 +24,7 @@ nonebot.load_from_toml("pyproject.toml")
 
 @on_command("hello").handle()
 async def handle_hello(bot: Bot, event: MessageEvent):
-    await bot.send(event, "world")
+    await bot.send(event, event.message)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 from functools import wraps
-from typing import Callable, TYPE_CHECKING, List, Awaitable, Optional
+from typing import TYPE_CHECKING, List, Callable, Optional, Awaitable
 
 from nonebot import message
 

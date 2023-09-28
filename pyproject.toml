@@ -18,6 +18,8 @@ packages = [
 python = "^3.8"
 nonebot2 = "^2.1.0"
 nonebot-adapter-onebot = "^2.3.0"
+nonebot-plugin-datastore = "^1.1.2"
+unqlite = "^0.9.6"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.0.275"
@@ -35,6 +37,7 @@ nonebot-adapter-red = "^0.5.0"
 [tool.poetry.group.test_plugins.dependencies]
 nonebot-plugin-escape-url = { version = "*", python = "^3.9" }
 nonebot-plugin-access-control = { version = "*", python = "^3.9" }
+nonebot-plugin-pixivbot = { version = ">= 2.0.4", python = "^3.9" }
 nonebot-plugin-mahjong-utils = { version = ">= 0.4.3", extras = ["htmlrender"], python = "^3.9" }
 
 [tool.black]
@@ -67,7 +70,8 @@ mark-parentheses = false
 plugins = [
   "nonebot_plugin_escape_url",
   "nonebot_plugin_access_control",
-  "nonebot_plugin_mahjong_utils"
+  "nonebot_plugin_mahjong_utils",
+  "nonebot_plugin_pixivbot"
 ]
 
 [build-system]

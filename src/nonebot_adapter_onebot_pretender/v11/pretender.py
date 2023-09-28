@@ -1,26 +1,30 @@
-from abc import abstractmethod, ABCMeta
+from abc import ABCMeta, abstractmethod
 from typing import (
-    TypeVar,
-    Generic,
-    Type,
-    Any,
-    Callable,
     TYPE_CHECKING,
+    Any,
     Dict,
-    Optional,
+    Type,
     Tuple,
+    Generic,
+    TypeVar,
+    Callable,
+    Optional,
+    ParamSpec,
 )
 
 from nonebot import logger
-from nonebot.adapters import Adapter as BaseAdapter, Bot as BaseBot, Event as BaseEvent
-from nonebot.adapters.onebot.v11 import (
-    Bot as OB11Bot,
-    Event as OB11Event,
-    ApiNotAvailable,
-)
+from nonebot.adapters import Bot as BaseBot
+from nonebot.adapters import Event as BaseEvent
+from nonebot.adapters import Adapter as BaseAdapter
+from nonebot.adapters.onebot.v11 import Bot as OB11Bot
+from nonebot.adapters.onebot.v11 import ApiNotAvailable
+from nonebot.adapters.onebot.v11 import Event as OB11Event
 
 if TYPE_CHECKING:
     from .adapter import Adapter as OB11PretenderAdapter
+
+T = TypeVar("T")
+P = ParamSpec("P")
 
 T_ActualAdapter = TypeVar("T_ActualAdapter", bound=BaseAdapter)
 T_ActualBot = TypeVar("T_ActualBot", bound=BaseBot)
@@ -81,6 +85,17 @@ class OB11Pretender(
     async def handle_event(
         self, bot: T_ActualBot, event: T_ActualEvent
     ) -> Optional[OB11Event]:
+        self.log(
+            "DEBUG",
+            f"Receive {self.adapter.actual_adapter.get_name()}"
+            f" {type(event).__name__}: " + str(event),
+        )
+        self.log(
+            "TRACE",
+            f"{self.adapter.actual_adapter.get_name()}"
+            f" {type(event).__name__}: " + str(event.json()),
+        )
+
         handler = None
         for t_event in type(event).mro():
             handler = self._event_handler_mapping.get(t_event)
