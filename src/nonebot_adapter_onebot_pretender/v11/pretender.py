@@ -1,7 +1,8 @@
 from abc import abstractmethod, ABCMeta
 from typing import TypeVar, Generic, Type, Any, Callable, TYPE_CHECKING, Dict, Optional, Tuple
 
-from nonebot.adapters import Adapter as BaseAdapter, Bot as BaseBot, Event as BaseEvent, Message as BaseMessage
+from nonebot import logger
+from nonebot.adapters import Adapter as BaseAdapter, Bot as BaseBot, Event as BaseEvent
 from nonebot.adapters.onebot.v11 import Bot as OB11Bot, Event as OB11Event, ApiNotAvailable
 
 if TYPE_CHECKING:
@@ -11,7 +12,7 @@ T_ActualAdapter = TypeVar("T_ActualAdapter", bound=BaseAdapter)
 T_ActualBot = TypeVar("T_ActualBot", bound=BaseBot)
 T_ActualEvent = TypeVar("T_ActualEvent", bound=BaseEvent)
 
-T_ApiHandler = Callable[["OB11Pretender", OB11Bot, Dict], Any]
+T_ApiHandler = Callable[["OB11Pretender", T_ActualBot, ...], Any]
 T_EventHandler = Callable[["OB11Pretender", T_ActualBot, T_ActualEvent], OB11Event]
 
 
@@ -44,6 +45,10 @@ class OB11Pretender(Generic[T_ActualAdapter, T_ActualBot, T_ActualEvent], metacl
         self.adapter = adapter
 
     @classmethod
+    def log(cls, level: str, content: str, exc: Optional[BaseException] = None):
+        logger.opt(exception=exc).log(level, content)
+
+    @classmethod
     @abstractmethod
     def get_actual_adapter_type(cls) -> Type[T_ActualAdapter]:
         ...
@@ -52,8 +57,8 @@ class OB11Pretender(Generic[T_ActualAdapter, T_ActualBot, T_ActualEvent], metacl
         handler = self._api_call_handler_mapping.get(api)
         if handler is None:
             raise ApiNotAvailable
-
-        return await handler(self, bot, data)
+        actual_bot = self.adapter.get_actual_bot(bot)
+        return await handler(self, actual_bot, **data)
 
     async def handle_event(self, bot: T_ActualBot, event: T_ActualEvent) -> Optional[OB11Event]:
         handler = None

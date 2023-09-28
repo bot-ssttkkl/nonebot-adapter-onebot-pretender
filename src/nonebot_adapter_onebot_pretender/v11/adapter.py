@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from copy import copy
 from typing import Any, Generic, TYPE_CHECKING, Type, TypeVar, Optional
 
-from nonebot import Driver, logger
+from nonebot import Driver
 from nonebot.adapters import (Adapter as BaseAdapter, Bot as BaseBot, Event as BaseEvent)
 from nonebot.adapters.onebot.v11 import (Adapter as OB11Adapter, Bot as OB11Bot)
 from typing_extensions import override
@@ -28,9 +28,11 @@ class Adapter(OB11Adapter, Generic[T_ActualAdapter, T_ActualBot], ABC):
             if bot.self_id in self.actual_adapter.bots:
                 handled_event = await self.pretender.handle_event(bot, event)
                 if handled_event is None:
-                    logger.warning(
+                    self.pretender.log(
+                        "WARNING",
                         f"No event handler for {type(event).__name__} ({self.actual_adapter.get_name()}) found, "
-                        f"event was ignored")
+                        f"event was ignored"
+                    )
                 else:
                     await origin_handle_event(self.bots[bot.self_id], handled_event)
                 return True

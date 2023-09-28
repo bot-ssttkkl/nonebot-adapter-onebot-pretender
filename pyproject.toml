@@ -11,7 +11,7 @@ documentation = ""
 keywords = []
 classifiers = []
 packages = [
-  { include = "nonebot", from = "src" }
+  { include = "nonebot_adapter_onebot_pretender", from = "src" }
 ]
 
 [tool.poetry.dependencies]
@@ -30,6 +30,10 @@ nonebot2 = { extras = ["fastapi", "websockets", "httpx"], version = "^2.1.0" }
 
 [tool.poetry.group.adapters.dependencies]
 nonebot-adapter-red = "^0.5.0"
+
+
+[tool.poetry.group.test_plugins.dependencies]
+nonebot-plugin-escape-url = { version = "*", python = "^3.9" }
 
 [tool.black]
 line-length = 88
@@ -56,6 +60,11 @@ target-version = "py38"
 [tool.ruff.flake8-pytest-style]
 fixture-parentheses = false
 mark-parentheses = false
+
+[tool.nonebot]
+plugins = [
+  "nonebot_plugin_escape_url"
+]
 
 [build-system]
 requires = ["poetry_core>=1.0.0"]
