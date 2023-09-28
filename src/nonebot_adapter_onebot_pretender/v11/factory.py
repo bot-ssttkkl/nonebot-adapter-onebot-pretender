@@ -31,6 +31,9 @@ def create_ob11_adapter_pretender(*adapter: Type[BaseAdapter]) -> Type[OB11Prete
             def get_pretender_type(cls):
                 return pretender
 
+        Adapter.__module__ = OB11Adapter.__module__
+        Adapter.__qualname__ = OB11Adapter.__qualname__
+
         pretender_adapters.append(Adapter)
 
     class Adapter(OB11Adapter):
@@ -38,6 +41,9 @@ def create_ob11_adapter_pretender(*adapter: Type[BaseAdapter]) -> Type[OB11Prete
             self.pretender_adapters = []
             for adp in pretender_adapters:
                 self.pretender_adapters.append(adp(driver, **kwargs))
+
+    Adapter.__module__ = OB11Adapter.__module__
+    Adapter.__qualname__ = OB11Adapter.__qualname__
 
     return Adapter
 
