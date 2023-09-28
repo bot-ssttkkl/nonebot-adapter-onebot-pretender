@@ -5,8 +5,8 @@ description = ""
 authors = ["ssttkkl <huang.wen.long@hotmail.com>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/bot-ssttkkl/nonebot-adapter-onebot-pretender"
-repository = "https://github.com/bot-ssttkkl/nonebot-adapter-onebot-pretender"
+homepage = "https://github.com/ssttkkl/nonebot-adapter-onebot-pretender"
+repository = "https://github.com/ssttkkl/nonebot-adapter-onebot-pretender"
 documentation = ""
 keywords = []
 classifiers = []
@@ -35,6 +35,7 @@ nonebot-adapter-red = "^0.5.0"
 [tool.poetry.group.test_plugins.dependencies]
 nonebot-plugin-escape-url = { version = "*", python = "^3.9" }
 nonebot-plugin-access-control = { version = "*", python = "^3.9" }
+nonebot-plugin-mahjong-utils = { version = ">= 0.4.3", extras = ["htmlrender"], python = "^3.9" }
 
 [tool.black]
 line-length = 88
@@ -65,7 +66,8 @@ mark-parentheses = false
 [tool.nonebot]
 plugins = [
   "nonebot_plugin_escape_url",
-  "nonebot_plugin_access_control"
+  "nonebot_plugin_access_control",
+  "nonebot_plugin_mahjong_utils"
 ]
 
 [build-system]

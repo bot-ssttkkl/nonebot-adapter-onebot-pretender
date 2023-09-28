@@ -1,3 +1,4 @@
+from base64 import b64decode
 from pathlib import Path
 from typing import Type, Dict, Optional, Union
 
@@ -42,7 +43,10 @@ class RedOB11Pretender(OB11Pretender[RedAdapter, RedBot, red_event.Event]):
             elif m.type == "image":
                 file = m.data["file"]
                 if isinstance(file, str):
-                    file = Path(file)
+                    if file.startswith("base64://"):
+                        file = b64decode(file.removeprefix("base64://"))
+                    else:
+                        file = Path(file)
                 msg.append(RedMS.image(file))
             elif m.type == "video":
                 file = m.data["file"]
@@ -80,21 +84,26 @@ class RedOB11Pretender(OB11Pretender[RedAdapter, RedBot, red_event.Event]):
                 msg.append(OB11MS("face", {
                     "id": str(m.data["face_id"])
                 }))
+            elif m.type == "market_face":
+                msg.append(OB11MS("image", {
+                    "file": m.data["emoji_id"] + "_aio.image",
+                    "url": "file://" + m.data["static_path"]
+                }))
             elif m.type == "image":
                 msg.append(OB11MS("image", {
                     "file": m.data["md5"] + ".image",
-                    "url": m.data["path"]
+                    "url": "file://" + m.data["path"]
                 }))
             elif m.type == "video":
                 msg.append(OB11MS("video", {
                     "file": m.data["name"],
-                    "url": m.data["path"],
-                    "cover": m.data["thumb_path"]
+                    "url": "file://" + m.data["path"],
+                    "cover": "file://" + m.data["thumb_path"]
                 }))
             elif m.type == "voice":
                 msg.append(OB11MS("record", {
                     "file": m.data["name"],
-                    "url": m.data["path"]
+                    "url": "file://" + m.data["path"]
                 }))
             elif m.type == "reply":
                 msg.append(OB11MS("reply", {
