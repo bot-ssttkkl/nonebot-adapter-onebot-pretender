@@ -445,7 +445,7 @@ class RedOB11Pretender(OB11Pretender[RedAdapter, RedBot, red_event.Event]):
 
         reply = None
         if event.reply and event.reply.replayMsgId:
-            reply = await self.get_msg(bot, int(event.reply.replayMsgId))
+            reply = await self.get_msg(bot, message_id=int(event.reply.replayMsgId))
             if reply is not None:
                 reply = Reply.parse_obj(reply)
 
@@ -504,7 +504,7 @@ class RedOB11Pretender(OB11Pretender[RedAdapter, RedBot, red_event.Event]):
         reply = None
         if event.reply and event.reply.replayMsgId:
             reply = Reply.parse_obj(
-                await self.get_msg(bot, int(event.reply.replayMsgId))
+                await self.get_msg(bot, message_id=int(event.reply.replayMsgId))
             )
 
         save_ob11_msg(
