@@ -1,28 +1,28 @@
 import json
+from pathlib import Path
 from base64 import b64decode
 from datetime import datetime
-from pathlib import Path
-from typing import Dict, List, Type, Union, Optional
 from urllib.parse import urlencode, urlunsplit
+from typing import Dict, List, Type, Union, Optional
 
-from nonebot.adapters.onebot.v11 import ActionFailed
-from nonebot.adapters.onebot.v11 import Message as OB11Msg
-from nonebot.adapters.onebot.v11 import MessageSegment as OB11MS
-from nonebot.adapters.onebot.v11 import event as ob11_event
-from nonebot.adapters.onebot.v11.event import Reply, Sender
-from nonebot.adapters.red import Adapter as RedAdapter
 from nonebot.adapters.red import Bot as RedBot
 from nonebot.adapters.red import Message as RedMsg
-from nonebot.adapters.red import MessageSegment as RedMS
 from nonebot.adapters.red import event as red_event
 from nonebot.adapters.red.api.model import ChatType
-from nonebot.adapters.red.message import ForwardNode, MediaMessageSegment
+from nonebot.adapters.onebot.v11 import ActionFailed
+from nonebot.adapters.red import Adapter as RedAdapter
+from nonebot.adapters.red import MessageSegment as RedMS
+from nonebot.adapters.onebot.v11 import Message as OB11Msg
 from nonebot.utils import DataclassEncoder, logger_wrapper
+from nonebot.adapters.onebot.v11 import event as ob11_event
+from nonebot.adapters.onebot.v11.event import Reply, Sender
+from nonebot.adapters.onebot.v11 import MessageSegment as OB11MS
+from nonebot.adapters.red.message import ForwardNode, MediaMessageSegment
 
+from ....webapi import red  # noqa: F401
 from ...factory import register_ob11_pretender
 from ...pretender import OB11Pretender, event_handler, api_call_handler
 from ....data.ob11_msg import OB11MsgModel, load_ob11_msg, save_ob11_msg
-from ....webapi import red  # noqa: F401
 
 log = logger_wrapper("OneBot V11 Pretender (RedProtocol)")
 
@@ -262,9 +262,11 @@ class RedOB11Pretender(OB11Pretender[RedAdapter, RedBot, red_event.Event]):
         messages: Union[List[Dict], List[OB11MS], OB11Msg],
     ) -> Dict:
         messages = [
-            json.loads(json.dumps(seg, cls=DataclassEncoder))
-            if isinstance(seg, OB11MS)
-            else seg
+            (
+                json.loads(json.dumps(seg, cls=DataclassEncoder))
+                if isinstance(seg, OB11MS)
+                else seg
+            )
             for seg in messages
         ]  # 将Message转换为List
 
@@ -294,8 +296,8 @@ class RedOB11Pretender(OB11Pretender[RedAdapter, RedBot, red_event.Event]):
                     ForwardNode(
                         uin=str(data.get("uin") or data.get("user_id")),
                         name=data.get("name")
-                             or data.get("nickname")
-                             or str(data.get("uin") or data.get("user_id")),
+                        or data.get("nickname")
+                        or str(data.get("uin") or data.get("user_id")),
                         group=0,
                         message=self.convert_outgoing_msg(
                             OB11Msg(OB11MS(**raw_seg) for raw_seg in data["content"])
@@ -365,7 +367,7 @@ class RedOB11Pretender(OB11Pretender[RedAdapter, RedBot, red_event.Event]):
     async def get_group_member_list(
         self, bot: RedBot, *, group_id: int, **data: Dict
     ) -> List:
-        members = await bot.get_members(group_id, 2 ** 16 - 1)
+        members = await bot.get_members(group_id, 2**16 - 1)
         return [
             {
                 "group_id": group_id,
