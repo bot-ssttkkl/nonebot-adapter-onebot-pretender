@@ -72,8 +72,7 @@ class OB11Pretender(
 
     @classmethod
     @abstractmethod
-    def get_actual_adapter_type(cls) -> Type[T_ActualAdapter]:
-        ...
+    def get_actual_adapter_type(cls) -> Type[T_ActualAdapter]: ...
 
     async def handle_api_call(self, bot: OB11Bot, api: str, **data: Any) -> Any:
         handler = self._api_call_handler_mapping.get(api)

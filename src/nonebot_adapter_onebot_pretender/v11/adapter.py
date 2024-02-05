@@ -46,8 +46,9 @@ class Adapter(OB11Adapter, Generic[T_ActualAdapter, T_ActualBot], ABC):
 
     @classmethod
     @abstractmethod
-    def get_pretender_type(cls) -> Type["OB11Pretender[T_ActualAdapter, T_ActualBot]"]:
-        ...
+    def get_pretender_type(
+        cls,
+    ) -> Type["OB11Pretender[T_ActualAdapter, T_ActualBot]"]: ...
 
     def get_actual_bot(self, bot: OB11Bot) -> Optional[T_ActualBot]:
         return self.actual_adapter.bots.get(bot.self_id)
